@@ -26,7 +26,7 @@ int OnInit()
 //---
   thisSymbol = Symbol();
 
-  double i = iCustom(thisSymbol, PERIOD_CURRENT, "U-logic-1440", 0, 1);
+//  double i = iCustom(thisSymbol, PERIOD_CURRENT, "U-logic-1440", 1, 1);
   
 //---
    return(INIT_SUCCEEDED);
