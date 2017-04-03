@@ -18,6 +18,8 @@ const string LoseSignal = "OBJ I1 CLOSE WIN ";
 const string CloseMartinSignal = "OBJ I1 CLOSE MARTIN ";
 
 string thisSymbol;
+double minLot;
+double maxLot;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -26,7 +28,10 @@ int OnInit()
   {
 //---
   thisSymbol = Symbol();
-  
+
+  minLot = MarketInfo(Symbol(), MODE_MINLOT);
+  maxLot = MarketInfo(Symbol(), MODE_MAXLOT);
+
 //---
    return(INIT_SUCCEEDED);
   }
@@ -71,13 +76,15 @@ void OnTick()
       }
     }
   }
-  
-  double atr = iATR(Symbol(), PERIOD_CURRENT, 14, 0);
-  
-  if(0 < OrdersTotal()) {
+
+  if(Entry_Lot < minLot || maxLot < Entry_Lot) {
+    Print("lot size invalid, min = ", minLot, ", max = ", maxLot);
     return;
   }
-  else if(signal == OP_BUY) {
+  
+  double atr = iATR(Symbol(), PERIOD_CURRENT, 14, 0);
+
+  if(signal == OP_BUY) {
     int ordered = OrderSend(thisSymbol, OP_BUY, Entry_Lot, NormalizeDouble(Ask, Digits), 3, NormalizeDouble(Ask - atr, Digits), NormalizeDouble(Ask + atr, Digits));
   }
   else if(signal == OP_SELL) {
