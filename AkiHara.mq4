@@ -9,6 +9,7 @@
 #property version   "1.00"
 #property strict
 
+input double Entry_Lot = 0.1;
 
 const string SellSignal = "OBJ I1 OPEN S ";
 const string BuySignal = "OBJ I1 OPEN B ";
@@ -25,8 +26,6 @@ int OnInit()
   {
 //---
   thisSymbol = Symbol();
-
-//  double i = iCustom(thisSymbol, PERIOD_CURRENT, "U-logic-1440", 1, 1);
   
 //---
    return(INIT_SUCCEEDED);
@@ -53,7 +52,7 @@ void OnTick()
   else if(ObjectGetDouble(0, SellSignal + TimeToStr(Time[1]), OBJPROP_PRICE)) {
     signal = OP_SELL;
   }
-  
+    
   for(int i = 0; i < OrdersTotal(); i++) {
     if(OrderSelect(i, SELECT_BY_POS)) {
       if(!StringCompare(OrderSymbol(), thisSymbol)) {
@@ -74,13 +73,15 @@ void OnTick()
   }
   
   double atr = iATR(Symbol(), PERIOD_CURRENT, 14, 0);
-  double lot = 1.0;
-
-  if(signal == OP_BUY) {
-    int ordered = OrderSend(thisSymbol, OP_BUY, lot, NormalizeDouble(Ask, Digits), 3, NormalizeDouble(Ask - atr, Digits), NormalizeDouble(Ask + atr, Digits));
+  
+  if(0 < OrdersTotal()) {
+    return;
+  }
+  else if(signal == OP_BUY) {
+    int ordered = OrderSend(thisSymbol, OP_BUY, Entry_Lot, NormalizeDouble(Ask, Digits), 3, NormalizeDouble(Ask - atr, Digits), NormalizeDouble(Ask + atr, Digits));
   }
   else if(signal == OP_SELL) {
-    int ordered = OrderSend(thisSymbol, OP_SELL, lot, NormalizeDouble(Bid, Digits), 3, NormalizeDouble(Bid + atr, Digits), NormalizeDouble(Bid - atr, Digits));
+    int ordered = OrderSend(thisSymbol, OP_SELL, Entry_Lot, NormalizeDouble(Bid, Digits), 3, NormalizeDouble(Bid + atr, Digits), NormalizeDouble(Bid - atr, Digits));
   }
 }
 //+------------------------------------------------------------------+
