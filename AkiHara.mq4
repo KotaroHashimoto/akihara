@@ -9,6 +9,7 @@
 #property version   "1.00"
 #property strict
 
+input int Magic_Number = 1;
 input double Entry_Lot = 0.1;
 
 const string SellSignal = "OBJ I1 OPEN S ";
@@ -60,7 +61,7 @@ void OnTick()
     
   for(int i = 0; i < OrdersTotal(); i++) {
     if(OrderSelect(i, SELECT_BY_POS)) {
-      if(!StringCompare(OrderSymbol(), thisSymbol)) {
+      if(!StringCompare(OrderSymbol(), thisSymbol) && OrderMagicNumber() == Magic_Number) {
         if(OrderType() == OP_BUY) {
           if(signal == -1) {
             bool closed = OrderClose(OrderTicket(), OrderLots(), NormalizeDouble(Bid, Digits), 0);
@@ -85,10 +86,10 @@ void OnTick()
   double atr = iATR(Symbol(), PERIOD_CURRENT, 14, 0);
 
   if(signal == OP_BUY) {
-    int ordered = OrderSend(thisSymbol, OP_BUY, Entry_Lot, NormalizeDouble(Ask, Digits), 3, NormalizeDouble(Ask - atr, Digits), NormalizeDouble(Ask + atr, Digits));
+    int ordered = OrderSend(thisSymbol, OP_BUY, Entry_Lot, NormalizeDouble(Ask, Digits), 3, NormalizeDouble(Ask - atr, Digits), NormalizeDouble(Ask + atr, Digits), NULL, Magic_Number);
   }
   else if(signal == OP_SELL) {
-    int ordered = OrderSend(thisSymbol, OP_SELL, Entry_Lot, NormalizeDouble(Bid, Digits), 3, NormalizeDouble(Bid + atr, Digits), NormalizeDouble(Bid - atr, Digits));
+    int ordered = OrderSend(thisSymbol, OP_SELL, Entry_Lot, NormalizeDouble(Bid, Digits), 3, NormalizeDouble(Bid + atr, Digits), NormalizeDouble(Bid - atr, Digits), NULL, Magic_Number);
   }
 }
 //+------------------------------------------------------------------+
